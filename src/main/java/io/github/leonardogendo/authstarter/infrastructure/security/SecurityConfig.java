@@ -71,8 +71,7 @@ public class SecurityConfig {
                                         "/api/auth/login"
                                 ).permitAll()
 
-                                .anyRequest()
-                                .authenticated()
+                                .anyRequest().authenticated()
                 )
 
                 .exceptionHandling(exceptions ->
