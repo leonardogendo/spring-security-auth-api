@@ -1,5 +1,6 @@
 package io.github.leonardogendo.authstarter.auth.service;
 
+import io.github.leonardogendo.authstarter.auth.security.CustomUserDetails;
 import io.github.leonardogendo.authstarter.infrastructure.security.JwtProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -23,6 +24,8 @@ public class JwtService {
 
         Instant now = Instant.now();
 
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
         List<String> authorities = authentication.getAuthorities()
                 .stream()
                 .map(GrantedAuthority::getAuthority)
@@ -30,7 +33,7 @@ public class JwtService {
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer(jwtProperties.issuer())
-                .subject(authentication.getName())
+                .subject(userDetails.getUserId().toString())
                 .audience(List.of(jwtProperties.audience()))
                 .issuedAt(now)
                 .expiresAt(now.plus(jwtProperties.accessTokenTtl()))

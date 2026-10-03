@@ -8,11 +8,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import io.github.leonardogendo.authstarter.user.entity.User;
 
 import java.util.Collection;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails {
 
     private final User user;
+
+    public UUID getUserId() {
+        return user.getId();
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
