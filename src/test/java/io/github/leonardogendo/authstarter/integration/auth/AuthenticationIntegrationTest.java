@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
@@ -23,10 +24,13 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -76,7 +80,7 @@ class AuthenticationIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
-                                          "email": "USER@EXAMPLE.COM",
+                                          "email": "USER@example.com",
                                           "password": "SecurePassword123!"
                                         }
                                         """)
@@ -142,7 +146,7 @@ class AuthenticationIntegrationTest {
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content("""
                                         {
-                                          "email": "USER@EXAMPLE.COM",
+                                          "email": "USER@example.com",
                                           "password": "AnotherPassword123!"
                                         }
                                         """)
@@ -159,7 +163,7 @@ class AuthenticationIntegrationTest {
     }
 
     @Test
-    void login_withRegisteredCredentials_shouldReturnRealJwt()
+    void login_withRegisteredCredentials_shouldReturnRealJwtWithUuidSubject()
             throws Exception {
 
         mockMvc.perform(
@@ -173,6 +177,13 @@ class AuthenticationIntegrationTest {
                                         """)
                 )
                 .andExpect(status().isCreated());
+
+        User persistedUser =
+                userRepository
+                        .findWithRolesByEmail("user@example.com")
+                        .orElseThrow();
+
+        UUID expectedUserId = persistedUser.getId();
 
         String responseBody =
                 mockMvc.perform(
@@ -199,16 +210,15 @@ class AuthenticationIntegrationTest {
                 response.get("accessToken")
                         .asString();
 
-        assertThat(accessToken.split("\\."))
+        String[] tokenParts = accessToken.split("\\.");
+
+        assertThat(tokenParts)
                 .hasSize(3);
 
         String payloadJson =
                 new String(
                         Base64.getUrlDecoder()
-                                .decode(
-                                        accessToken
-                                                .split("\\.")[1]
-                                ),
+                                .decode(tokenParts[1]),
                         StandardCharsets.UTF_8
                 );
 
@@ -216,7 +226,7 @@ class AuthenticationIntegrationTest {
                 jsonMapper.readTree(payloadJson);
 
         assertThat(payload.get("sub").asString())
-                .isEqualTo("user@example.com");
+                .isEqualTo(expectedUserId.toString());
 
         assertThat(payload.get("iss").asString())
                 .isEqualTo("auth-starter-test");
@@ -231,9 +241,7 @@ class AuthenticationIntegrationTest {
                 .isPositive();
 
         assertThat(payload.get("exp").asLong())
-                .isGreaterThan(
-                        payload.get("iat").asLong()
-                );
+                .isGreaterThan(payload.get("iat").asLong());
     }
 
     @Test
@@ -270,5 +278,83 @@ class AuthenticationIntegrationTest {
                         .value("AUTH_INVALID_CREDENTIALS"))
                 .andExpect(jsonPath("$.accessToken")
                         .doesNotExist());
+    }
+
+    @Test
+    void getMe_withoutAccessToken_shouldReturn401()
+            throws Exception {
+
+        mockMvc.perform(
+                        get("/api/users/me")
+                )
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void getMe_withValidAccessToken_shouldReturnAuthenticatedUser()
+            throws Exception {
+
+        // Arrange: Register user
+        mockMvc.perform(
+                        post("/api/auth/register")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content("""
+                                        {
+                                          "email": "user@example.com",
+                                          "password": "SecurePassword123!"
+                                        }
+                                        """)
+                )
+                .andExpect(status().isCreated());
+
+        User persistedUser =
+                userRepository
+                        .findWithRolesByEmail("user@example.com")
+                        .orElseThrow();
+
+        UUID expectedUserId = persistedUser.getId();
+
+        // Act: Authenticate and obtain a real JWT
+        String loginResponse =
+                mockMvc.perform(
+                                post("/api/auth/login")
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .content("""
+                                                {
+                                                  "email": "user@example.com",
+                                                  "password": "SecurePassword123!"
+                                                }
+                                                """)
+                        )
+                        .andExpect(status().isOk())
+                        .andReturn()
+                        .getResponse()
+                        .getContentAsString();
+
+        String accessToken =
+                jsonMapper.readTree(loginResponse)
+                        .get("accessToken")
+                        .asString();
+
+        // Assert: Access protected resource using real Bearer token
+        mockMvc.perform(
+                        get("/api/users/me")
+                                .header(
+                                        "Authorization",
+                                        "Bearer " + accessToken
+                                )
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(
+                        MediaType.APPLICATION_JSON
+                ))
+                .andExpect(jsonPath("$.id")
+                        .value(expectedUserId.toString()))
+                .andExpect(jsonPath("$.email")
+                        .value("user@example.com"))
+                .andExpect(jsonPath("$.enabled")
+                        .value(true))
+                .andExpect(jsonPath("$.createdAt")
+                        .isNotEmpty());
     }
 }
