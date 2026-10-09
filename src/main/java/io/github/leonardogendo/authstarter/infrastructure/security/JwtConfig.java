@@ -25,9 +25,7 @@ import java.util.Base64;
 public class JwtConfig {
 
     @Bean
-    public SecretKey jwtSecretKey(
-            JwtProperties properties
-    ) {
+    public SecretKey jwtSecretKey(JwtProperties properties) {
 
         byte[] keyBytes = Base64.getDecoder()
                 .decode(properties.secret());
@@ -83,8 +81,7 @@ public class JwtConfig {
     }
 
     @Bean
-    public JwtAuthenticationConverter
-    jwtAuthenticationConverter() {
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
 
         JwtGrantedAuthoritiesConverter authoritiesConverter =
                 new JwtGrantedAuthoritiesConverter();

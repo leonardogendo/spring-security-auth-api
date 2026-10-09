@@ -85,8 +85,8 @@ Phase 8 — Starter Experience & Reference Documentation
 - Spring Security: UserDetails, UserDetailsService, DaoAuthenticationProvider, AuthenticationManager
 - JWT issuance: short-lived access tokens with iss, sub, aud, iat, exp claims
 - Resource Server: OAuth2 bearer-token validation
-- Protected endpoint: GET /api/user/profile
-- Generic authentication failure responses
+- Protected endpoint: GET /api/users/me
+- Authentication failure responses
 - User registration with email normalization
 - Password policy validation
 
