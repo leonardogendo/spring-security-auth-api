@@ -1,12 +1,14 @@
 # Spring Security Auth Starter
 
-> A security-focused, opinionated Spring Boot authentication and authorization foundation for REST APIs.
+A security-focused, opinionated Spring Boot authentication and authorization foundation for REST APIs.
 
 `spring-security-auth-starter` is a reusable Spring Boot starter for building authentication and authorization into modern applications without redesigning the same security primitives from scratch.
 
 The project focuses not only on making authentication work, but on making the underlying **security decisions, trust boundaries, failure cases, and trade-offs explicit and testable**.
 
-> **Status:** Under active development — currently building `v0.1.0: Authentication Foundation`.
+> **Status:** Under Active Development
+
+> **Current Release**: `v0.1.0: Authentication Foundation`.
 
 ---
 
@@ -32,23 +34,43 @@ The goal is not to replace security review or engineering judgment. **It is to p
 
 ### `v0.1.0 — Authentication Foundation`
 
-Establishes core authentication trust boundary: persisted user accounts → Spring Security authentication → JWT access tokens → Resource Server validation → protected endpoints.
+Establishes the initial authentication baseline for Spring Boot REST APIs. covering user authentication, JWT-based access, and protected resource access.
 
-**Scope:** password hashing, credential authentication, short-lived JWT issuance, signature/issuer/audience validation, stateless API security, generic failure responses, unit and integration tests.
+### Implemented
 
-**Deferred:** refresh tokens, registration, email verification, password recovery, RBAC, login throttling, MFA.
+- User registration and login
+- Password hashing and secure credential storage
+- Spring Security authentication
+- JWT-access token issuance and validation
+- Protected user resource access
 
-See [`ROADMAP.md`](./ROADMAP.md) for complete development plan.
+### Next Milestone
+
+**v0.2.0 — Refresh Token & Session Security**
+
+Introduce secure session lifecycle management through persisted refresh tokens, token rotation, replay detection, revocation, and logout with session invalidation.
+
+See [`ROADMAP.md`](./ROADMAP.md) for complete development plan, and
+
+[`CHANGELOG.md`]() for release history.
 
 ---
 
 ## Security Model
 
-**Authentication:** Spring Security (AuthenticationManager → DaoAuthenticationProvider → UserDetailsService + PasswordEncoder). Passwords never stored in plaintext. Generic failure responses reduce account enumeration.
+The starter uses Spring Security-native mechanisms to establish authentication and protect REST API resources.
 
-**Access Tokens:** Short-lived signed JWT with iss, sub, aud, iat, exp claims. Bearer credentials requiring cryptographic and claim validation before trust.
+**Authentication:** 
+Spring Security's AuthenticationManager, DaoAuthenticationProvider, UserDetailsService, and PasswordEncoder provide the credential authentication flow.
+Passwords are stored as hashes, never plaintext.
 
-**Resource Protection:** Spring Security OAuth2 Resource Server for bearer-token processing and JWT validation. No custom JWT filter—framework-native security preferred.
+**Access Tokens:** 
+JWT access tokens establish authenticated API requests. Token validation must verify signature and enforce the configured issuer, audience, and expiration requirements before accepting a token.
+
+**Resource Protection:** 
+Spring Security OAuth2 Resource Server handles bearer-token processing and JWT validation. Protected endpoints require valid authentication, with authorization policies enforced server-side. 
+
+See [`docs/`]() for detailed security architecture, authentication behavior and design decisions.
 
 ---
 
@@ -56,39 +78,56 @@ See [`ROADMAP.md`](./ROADMAP.md) for complete development plan.
 
 **Core:** 
 
-`Java`, `Spring Boot`, `Spring Security`, `Spring Security OAuth2 Resource Server`, `PostgreSQL`, `Flyway`
+`Java`, `Spring Boot`, `Spring Security`, `Spring Security OAuth2 Resource Server`, `PostgreSQL`, `Flyway`, `Maven`
 
 **Security:** 
 
 `Spring Security` authentication, `JWT` access tokens, `Spring Security JOSE/JWT`, password hashing
 
-**Quality:** 
-
-`Maven`, `JUnit`
-
 ---
 
 ## Getting Started
 
-**Prerequisites:** Java, Maven, PostgreSQL
+**Prerequisites:** Java 25, Maven, PostgreSQL
 
-**Setup:**
+### Setup
+
 ```bash
 git clone https://github.com/leonardogendo/spring-security-auth-starter.git
 cd spring-security-auth-starter
 ```
 
-**Configuration:** Security-sensitive configuration must be externalized. `.env.example` will provide required configuration names without real credentials. Never commit passwords, database credentials, JWT signing secrets, private keys, or API credentials.
+### Configuration
 
-Detailed setup instructions will be added as the configuration model stabilizes.
+Generate a secure JWT signing secret:
+
+```bash
+export JWT_SECRET="$(openssl rand -base64 32)"
+```
+
+Configure the database connection using `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`, or use the development defaults defined in `application-dev.yaml`.
+
+### Run
+
+Start the application using the development profile:
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.profiles=dev
+```
+
+For production, configure the required environment variables and activate the `prod` profile. Never commit real credentials or signing secrets to source control.
 
 ---
 
 ## Testing
 
-Negative security behavior is a first-class testing requirement. 
+The project uses layered automated testing to verify application behavior, component integration, and security controls.
 
-Authentication foundation tests: valid credentials, invalid password, unknown user, missing/malformed/tampered/expired JWT, invalid signature, wrong issuer/audience. 
+- **Unit tests**: Verify individual units and security logic in isolation.
+- **Slice tests**: Verify focused Spring application layers within a limited application context.
+- **Integration tests**: Verify interactions across application components and security boundaries.
+
+Security testing emphasizes both positive and negative behavior, including authentication failures, invalid or expired JWTs, signature validation, issuer and audience validation, and unauthorized access.
 
 A security control is not complete simply because its happy path works.
 
@@ -96,16 +135,19 @@ A security control is not complete simply because its happy path works.
 
 ## Documentation
 
-Security and architecture documentation will live under `docs/` as capabilities are implemented: 
-- architecture.md
-- authentication-model.md
-- token-model.md
-- authorization-model.md
-- threat-model.md
-- security-decisions.md
-- deployment-security.md
+Security and architecture documentation will evolve alongside implemented capabilities.
 
-Documentation focuses on both **how** and **why**.
+Planned documentation includes:
+
+- `architecture.md` — System structure and component boundaries
+- `authentication-model.md` — Authentication flow and credential handling
+- `token-model.md` — JWT claims, validation, and token lifecycle
+- `authorization-model.md` — Access-control policies and enforcement
+- `threat-model.md` — Threat assumptions, attack surfaces, and mitigations
+- `security-decisions.md` — Security decisions, alternatives, and trade-offs
+- `deployment-security.md` — Deployment-specific security considerations
+
+Documentation focuses on both **how** the system works and **why** its security decisions were made.
 
 ---
 
