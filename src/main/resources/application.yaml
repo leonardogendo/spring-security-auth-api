@@ -1,6 +1,6 @@
 spring:
   application:
-    name: auth-starter
+    name: spring-security-auth-api
 
   jpa:
     open-in-view: false
@@ -11,6 +11,6 @@ spring:
 # The application both issues and validates JWTs, so both issuer and audience are the same
 jwt:
   secret: ${JWT_SECRET}
-  issuer: auth-starter
-  audience: auth-starter
+  issuer: auth-api
+  audience: auth-api
   access-token-ttl: 15m

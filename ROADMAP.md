@@ -1,8 +1,8 @@
-# Spring Security Auth Starter — Roadmap
+# Spring Security Auth API — Roadmap
 
 > A reusable, security-focused Spring Boot authentication and authorization foundation for REST APIs.
 
-This roadmap defines the planned evolution of `spring-security-auth-starter` from a minimal authentication foundation into a reusable, security-reviewed starter for modern Spring Boot applications.
+This roadmap defines the planned evolution of `spring-security-auth-api` from a minimal authentication foundation into a reusable, security-reviewed API for modern Spring Boot applications.
 
 The project is intentionally developed in **security-focused milestones** rather than as a large feature dump. Each milestone should leave the repository in a stable, demonstrable, and documented state.
 
@@ -10,7 +10,7 @@ The project is intentionally developed in **security-focused milestones** rather
 
 ## Project Direction
 
-The starter provides developers with a secure and opinionated foundation for authentication and authorization without requiring every application to redesign the same security primitives from scratch.
+The API provides developers with a secure and opinionated foundation for authentication and authorization without requiring every application to redesign the same security primitives from scratch.
 
 As AI-assisted development makes functional code increasingly easy to generate, the harder problem remains unchanged: ensuring that security decisions, trust boundaries, and failure cases are sound. Authentication can work perfectly on the happy path while still containing weaknesses in token validation, session lifecycle, credential recovery, authorization, or abuse protection.
 
@@ -26,7 +26,7 @@ This project therefore provides more than authentication boilerplate. It establi
 
 It is designed for both traditional and AI-assisted development, giving developers a reviewed foundation to extend rather than reinventing authentication and authorization security for every application.
 
-The goal is not to replace security review or engineering judgment — **it is to provide a stronger place to start.**
+The goal is not to replace security review or engineering judgment — **it is to provide a stronger foundation.**
 
 The initial architecture assumes a **modular monolith REST API**.
 
@@ -43,7 +43,7 @@ Phase 1 — Authentication Foundation
         ↓
 Phase 2 — Refresh Token & Session Security
         ↓
-Phase 3 — Registration & Account Verification
+Phase 3 — Account Verification
         ↓
 Phase 4 — Authorization Model
         ↓
@@ -53,7 +53,7 @@ Phase 6 — Abuse Protection & Operational Security
         ↓
 Phase 7 — Security Testing & CI Hardening
         ↓
-Phase 8 — Starter Experience & Reference Documentation
+Phase 8 — Developer Experience & Reference Documentation
 ```
 
 ---
@@ -206,16 +206,16 @@ Phase 8 — Starter Experience & Reference Documentation
 
 ---
 
-# Phase 8 — Starter Experience & Reference Documentation
+# Phase 8 — Developer Experience & Reference Documentation
 
-**Goal:** Repository reusable by other developers.
+**Goal:** Make the API straightforward for other developers to configure, run, understand, and integrate into their applications
 
 **Scope:**
 - Developer experience: clone-and-run instructions, .env.example, Docker Compose, API examples
 - Security documentation: architecture.md, authentication-model.md, threat-model.md, security-decisions.md
 - Document security decisions with context, threat addressed, alternatives, trade-offs
 
-**Release:** v1.0.0 — Stable Starter Foundation
+**Release:** v1.0.0 — Stable API Foundation
 
 ---
 
@@ -240,7 +240,7 @@ Milestone-based semantic releases:
 - v0.5.0 — Password Recovery & Reauthentication
 - v0.6.0 — Abuse Protection & Audit Security
 - v0.7.0 — Security Testing & CI Hardening
-- v1.0.0 — Stable Starter Foundation
+- v1.0.0 — Stable API Foundation
 
 ---
 

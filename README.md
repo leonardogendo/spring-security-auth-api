@@ -1,8 +1,8 @@
-# Spring Security Auth Starter
+# Spring Security Auth Api
 
 A security-focused, opinionated Spring Boot authentication and authorization foundation for REST APIs.
 
-`spring-security-auth-starter` is a reusable Spring Boot starter for building authentication and authorization into modern applications without redesigning the same security primitives from scratch.
+`spring-security-auth-api` is a reusable Spring Boot REST API for implementing authentication and authorization in modern applications without redesigning the same security primitives from scratch.
 
 The project focuses not only on making authentication work, but on making the underlying **security decisions, trust boundaries, failure cases, and trade-offs explicit and testable**.
 
@@ -26,7 +26,7 @@ This project provides an intentionally designed baseline built around:
 * positive and negative security testing
 * production-oriented configuration patterns
 
-The goal is not to replace security review or engineering judgment. **It is to provide a stronger place to start.**
+The goal is not to replace security review or engineering judgment. **It is to provide a stronger foundation.**
 
 ---
 
@@ -52,13 +52,13 @@ Introduce secure session lifecycle management through persisted refresh tokens, 
 
 See [`ROADMAP.md`](./ROADMAP.md) for complete development plan, and
 
-[`CHANGELOG.md`]() for release history.
+[`CHANGELOG.md`](./CHANGELOG.md) for release history.
 
 ---
 
 ## Security Model
 
-The starter uses Spring Security-native mechanisms to establish authentication and protect REST API resources.
+The API uses Spring Security-native mechanisms to establish authentication and protect REST API resources.
 
 **Authentication:** 
 Spring Security's AuthenticationManager, DaoAuthenticationProvider, UserDetailsService, and PasswordEncoder provide the credential authentication flow.
@@ -93,8 +93,8 @@ See [`docs/`]() for detailed security architecture, authentication behavior and 
 ### Setup
 
 ```bash
-git clone https://github.com/leonardogendo/spring-security-auth-starter.git
-cd spring-security-auth-starter
+git clone https://github.com/leonardogendo/spring-security-auth-api.git
+cd spring-security-auth-api
 ```
 
 ### Configuration
@@ -153,7 +153,7 @@ Documentation focuses on both **how** the system works and **why** its security 
 
 ## Security Notice
 
-This repository provides a security-focused starting point, not a universal authentication solution. 
+This repository provides a security-focused foundation, not a universal authentication solution. 
 
 Security requirements vary by application, client type, deployment environment, threat model, and regulatory context. 
 
